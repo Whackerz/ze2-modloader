@@ -1,0 +1,17 @@
+﻿<Ze2Mod>
+  <Id>shower_forge_pack</Id>
+  <Name>Shower Forge Pack</Name>
+  <Enabled>true</Enabled>
+  <Characters>
+    <Character File="Characters/AstraNomad.chr" Sprite="Sprites/AstraNomad.png" />
+  </Characters>
+  <Guns>
+    <Gun File="Guns/Nebula Quill.gun" Sprite="Sprites/NebulaQuill.png" />
+    <Gun File="Guns/Comet Driver.gun" Sprite="Sprites/CometDriver.png" />
+    <Gun File="Guns/Aether SMG.gun" Sprite="Sprites/AetherSMG.png" />
+    <Gun File="Guns/Storm Lance.gun" Sprite="Sprites/StormLance.png" />
+  </Guns>
+  <Bullets>
+    <Bullet File="Bullets/NebulaSpike.bul" Sprite="Sprites/NebulaSpike.png" SpriteMode="Horizontal" />
+  </Bullets>
+</Ze2Mod>

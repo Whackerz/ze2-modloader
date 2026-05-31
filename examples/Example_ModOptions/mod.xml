@@ -1,0 +1,10 @@
+<Ze2Mod>
+  <Id>example_mod_options</Id>
+  <Name>Example - Mod Options</Name>
+  <Enabled>true</Enabled>
+  <Options>
+    <Option Key="HardMode" Name="Hard Mode" Type="Bool" Default="false" />
+    <Option Key="SpawnRate" Name="Spawn Rate" Type="Choice" Default="Normal" Choices="Low|Normal|High" />
+    <Option Key="BonusLives" Name="Bonus Lives" Type="Int" Default="1" />
+  </Options>
+</Ze2Mod>

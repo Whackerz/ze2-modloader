@@ -51,6 +51,22 @@ For multi-sector maps, include `MyMap1.*` and optionally `MyMap2.*`, then set `S
 </Ze2Mod>
 ```
 
+## Copyable Examples
+
+The repository includes focused sample mods in `examples/`:
+
+```text
+Example_CharacterOnly
+Example_GunAndBullet
+Example_DirectMap
+Example_CustomMapAssets
+Example_ModOptions
+Example_ShowerForgePack
+OptionalDllMods
+```
+
+See `EXAMPLES.md` for the feature demonstrated by each folder. These examples are meant to be copied into the game's top-level `Mods` folder one at a time while learning.
+
 ## Custom Maps
 
 Map prefixes should be simple and safe:

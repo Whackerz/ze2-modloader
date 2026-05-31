@@ -13,11 +13,16 @@ What this includes:
 - ZE2.LegacySpriteBridge\ZE2ModLoader.dll
 - installer/restore scripts
 - empty top-level Mods folder scaffold
+- ExampleMods folder with copyable sample mods
 
 Current behavior:
 - XML mods are loaded directly from Mods.
 - The loader is patched to avoid copying mod files into Data/*.
 - Custom maps support direct map files, custom tilesheets, and <MapName>_Shadow.png.
 - The main menu includes a Mods manager for enable/disable, load order, and mod option state.
+
+Examples:
+- Read Docs\EXAMPLES.md.
+- Copy one folder from ExampleMods into Mods, then restart the game.
 
 This overlay does not include the game. Use it only with your own local copy.

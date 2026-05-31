@@ -1,0 +1,8 @@
+<Ze2Mod>
+  <Id>example_character_only</Id>
+  <Name>Example - Character Only</Name>
+  <Enabled>true</Enabled>
+  <Characters>
+    <Character File="Characters/ExampleSprinter.chr" Sprite="Sprites/ExampleSprinter.png" />
+  </Characters>
+</Ze2Mod>

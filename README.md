@@ -6,8 +6,8 @@ This repository contains:
 
 - `dist/overlay` - files end users copy into a local Zombie Estate 2 folder.
 - `src` - current recovered/adapter source used to build the active DLLs.
-- `docs` - install, mod authoring, developer notes, and current status.
-- `examples` - example XML and optional DLL mods.
+- `docs` - install, mod authoring, examples, developer notes, and current status.
+- `examples` - copyable example mods for each supported feature.
 
 This repo does **not** include the Zombie Estate 2 game, game content, or Steam files. Users must own the game and install this into their own local copy.
 
@@ -74,5 +74,19 @@ For human-authored mods, prefer top-level `Mods`.
 - Basic mod-declared options state
 - Talent point XP and talent store bridge
 - Optional DLL mods implementing the loader extension interface
+
+## Example Mods
+
+The `examples/` folder includes small copyable examples:
+
+- `Example_CharacterOnly`
+- `Example_GunAndBullet`
+- `Example_DirectMap`
+- `Example_CustomMapAssets`
+- `Example_ModOptions`
+- `Example_ShowerForgePack`
+- `OptionalDllMods`
+
+See `docs/EXAMPLES.md` for what each example demonstrates and a recommended testing order.
 
 See `docs/` for details.

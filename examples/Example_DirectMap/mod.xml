@@ -1,0 +1,8 @@
+<Ze2Mod>
+  <Id>example_direct_map</Id>
+  <Name>Example - Direct Map</Name>
+  <Enabled>true</Enabled>
+  <Maps>
+    <Map Prefix="ExampleDirectMap" Folder="Maps/ExampleDirectMap" SectorCount="2" />
+  </Maps>
+</Ze2Mod>

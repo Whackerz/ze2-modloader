@@ -1,0 +1,14 @@
+<Ze2Mod>
+  <Id>example_custom_map_assets</Id>
+  <Name>Example - Custom Map Assets</Name>
+  <Enabled>true</Enabled>
+  <Maps>
+    <Map Prefix="ExampleAssetMap"
+         Folder="Maps/ExampleAssetMap"
+         SectorCount="2"
+         Tilesheet="Maps/ExampleAssetMap/ExampleAssetMap_Tiles.png"
+         LightTexture="Maps/ExampleAssetMap/ExampleAssetMap_Light.png"
+         DarkMod="1.0"
+         MainOnTop="false" />
+  </Maps>
+</Ze2Mod>

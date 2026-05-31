@@ -1,0 +1,11 @@
+<Ze2Mod>
+  <Id>example_gun_and_bullet</Id>
+  <Name>Example - Gun and Bullet</Name>
+  <Enabled>true</Enabled>
+  <Guns>
+    <Gun File="Guns/Example Sparkcaster.gun" Sprite="Sprites/ExampleSparkcaster.png" />
+  </Guns>
+  <Bullets>
+    <Bullet File="Bullets/ExampleSpark.bul" Sprite="Sprites/ExampleSpark.png" SpriteMode="Horizontal" />
+  </Bullets>
+</Ze2Mod>

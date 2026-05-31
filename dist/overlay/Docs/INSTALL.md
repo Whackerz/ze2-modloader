@@ -24,6 +24,16 @@ Install_ZE2_ModLoader.bat
 Zombie Estate 2.exe
 ```
 
+## Example Mods
+
+The install overlay includes example mods in:
+
+```text
+ExampleMods/
+```
+
+They are kept outside `Mods/` so they do not all load automatically. To test one, copy a single example folder from `ExampleMods/` into the top-level `Mods/` folder, restart the game, and check the Mods menu or the relevant game screen.
+
 ## What The Installer Does
 
 The installer:
