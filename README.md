@@ -23,10 +23,11 @@ The loader now has one primary runtime DLL:
 ## Install
 
 1. Make a copy of your Zombie Estate 2 install folder.
-2. Copy everything from `dist/overlay` into that copied game folder.
-3. Run `Install_ZE2_ModLoader.bat` once from inside the game folder.
-4. Launch with `Zombie Estate 2.exe`.
-5. Check `BepInEx/LogOutput.log` for loader messages.
+2. Extract the release zip and open the extracted `ZE2_ModLoader` folder.
+3. Copy everything inside `ZE2_ModLoader` into that copied game folder, including the whole `BepInEx` folder.
+4. Run `Install_ZE2_ModLoader.bat` once from inside the game folder.
+5. Launch with `Zombie Estate 2.exe`.
+6. Check `BepInEx/LogOutput.log` for loader messages.
 
 The installer backs up the original game executable as `Zombie Estate 2.real.exe` and places a launcher shim at `Zombie Estate 2.exe`.
 

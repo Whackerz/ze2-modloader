@@ -15,6 +15,35 @@ if not exist "steam_api.dll" (
 
 if not exist "BepInEx.NET.Framework.Launcher.exe" (
   echo ERROR: Missing BepInEx.NET.Framework.Launcher.exe
+  echo Make sure you copied every file and folder from the ZE2_ModLoader folder into the game folder.
+  exit /b 1
+)
+
+if not exist "BepInEx\core\BepInEx.Preloader.Core.dll" (
+  echo ERROR: Missing BepInEx\core\BepInEx.Preloader.Core.dll
+  echo The BepInEx folder was not copied correctly.
+  echo Copy the entire contents of the ZE2_ModLoader folder into the Zombie Estate 2 game folder, then run this installer again.
+  exit /b 1
+)
+
+if not exist "BepInEx\core\BepInEx.Core.dll" (
+  echo ERROR: Missing BepInEx\core\BepInEx.Core.dll
+  echo The BepInEx folder was not copied correctly.
+  echo Copy the entire contents of the ZE2_ModLoader folder into the Zombie Estate 2 game folder, then run this installer again.
+  exit /b 1
+)
+
+if not exist "BepInEx\core\0Harmony.dll" (
+  echo ERROR: Missing BepInEx\core\0Harmony.dll
+  echo The BepInEx folder was not copied correctly.
+  echo Copy the entire contents of the ZE2_ModLoader folder into the Zombie Estate 2 game folder, then run this installer again.
+  exit /b 1
+)
+
+if not exist "BepInEx\plugins\ZE2.ModLoader.dll" (
+  echo ERROR: Missing BepInEx\plugins\ZE2.ModLoader.dll
+  echo The modloader plugin was not copied correctly.
+  echo Copy the entire contents of the ZE2_ModLoader folder into the Zombie Estate 2 game folder, then run this installer again.
   exit /b 1
 )
 

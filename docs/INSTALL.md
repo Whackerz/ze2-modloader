@@ -11,14 +11,36 @@ Last updated: 2026-05-31
 ## Fresh Install
 
 1. Copy your Zombie Estate 2 folder somewhere safe for modding.
-2. Copy the contents of `dist/overlay` into that copied game folder.
-3. Run:
+2. Extract the release zip.
+3. Open the extracted `ZE2_ModLoader` folder.
+4. Copy everything inside `ZE2_ModLoader` into the copied game folder.
+
+Do not copy only the `.exe` or `.bat` files. The `BepInEx` folder must be copied too.
+
+The final game folder should look like:
+
+```text
+Zombie Estate 2/
+  Zombie Estate 2.exe
+  steam_api.dll
+  BepInEx/
+    core/
+      BepInEx.Preloader.Core.dll
+      BepInEx.Core.dll
+      0Harmony.dll
+    plugins/
+      ZE2.ModLoader.dll
+  Mods/
+  Install_ZE2_ModLoader.bat
+```
+
+5. Run:
 
 ```bat
 Install_ZE2_ModLoader.bat
 ```
 
-4. Launch:
+6. Launch:
 
 ```bat
 Zombie Estate 2.exe
@@ -81,6 +103,8 @@ If the game opens but mods do not appear, check:
 Mods/ZE2ModLoader.log
 BepInEx/LogOutput.log
 ```
+
+If the game reports that `BepInEx.Preloader.Core` could not be loaded, the install is incomplete. Copy the entire `BepInEx` folder from the release zip into the game folder and run `Install_ZE2_ModLoader.bat` again.
 
 ## Important Current Behavior
 

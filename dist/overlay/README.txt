@@ -2,9 +2,13 @@ ZE2 ModLoader - BepInEx Overlay
 
 Install:
 1. Back up or copy your Zombie Estate 2 folder.
-2. Extract/copy this overlay into that game folder.
-3. Run Install_ZE2_ModLoader.bat once.
-4. Launch with Zombie Estate 2.exe.
+2. Extract the zip.
+3. Open the extracted ZE2_ModLoader folder.
+4. Copy everything inside ZE2_ModLoader into the Zombie Estate 2 game folder.
+   Do not copy only the .exe or .bat files.
+   Do not leave the files nested as Zombie Estate 2\ZE2_ModLoader\BepInEx.
+5. Run Install_ZE2_ModLoader.bat once from the game folder.
+6. Launch with Zombie Estate 2.exe.
 
 What this includes:
 - BepInEx .NET Framework runtime
