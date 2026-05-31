@@ -19,6 +19,13 @@ if not exist "BepInEx.NET.Framework.Launcher.exe" (
   exit /b 1
 )
 
+if not exist "Zombie Estate 2.exe.config" (
+  echo ERROR: Missing Zombie Estate 2.exe.config
+  echo This config tells the .NET launcher where to find BepInEx\core.
+  echo Copy the entire contents of the ZE2_ModLoader folder into the Zombie Estate 2 game folder, then run this installer again.
+  exit /b 1
+)
+
 if not exist "BepInEx\core\BepInEx.Preloader.Core.dll" (
   echo ERROR: Missing BepInEx\core\BepInEx.Preloader.Core.dll
   echo The BepInEx folder was not copied correctly.

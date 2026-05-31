@@ -11,6 +11,7 @@ ZE2 ModLoader Verification
 5. Copy one folder from ExampleMods into Mods and restart to test sample content.
 
 If the game does not launch:
+- Ensure Zombie Estate 2.exe.config exists beside Zombie Estate 2.exe.
 - Ensure BepInEx\core\BepInEx.Preloader.Core.dll exists.
 - Ensure BepInEx\core\BepInEx.Core.dll exists.
 - Ensure BepInEx\core\0Harmony.dll exists.

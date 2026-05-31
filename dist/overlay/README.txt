@@ -7,6 +7,7 @@ Install:
 4. Copy everything inside ZE2_ModLoader into the Zombie Estate 2 game folder.
    Do not copy only the .exe or .bat files.
    Do not leave the files nested as Zombie Estate 2\ZE2_ModLoader\BepInEx.
+   The file Zombie Estate 2.exe.config must be beside Zombie Estate 2.exe.
 5. Run Install_ZE2_ModLoader.bat once from the game folder.
 6. Launch with Zombie Estate 2.exe.
 

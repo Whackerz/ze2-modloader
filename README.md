@@ -29,6 +29,8 @@ The loader now has one primary runtime DLL:
 5. Launch with `Zombie Estate 2.exe`.
 6. Check `BepInEx/LogOutput.log` for loader messages.
 
+`Zombie Estate 2.exe.config` must stay beside `Zombie Estate 2.exe`; it tells the .NET Framework launcher to load BepInEx assemblies from `BepInEx/core`.
+
 The installer backs up the original game executable as `Zombie Estate 2.real.exe` and places a launcher shim at `Zombie Estate 2.exe`.
 
 ## Quick Mod Folder

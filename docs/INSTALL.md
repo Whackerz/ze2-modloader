@@ -22,6 +22,7 @@ The final game folder should look like:
 ```text
 Zombie Estate 2/
   Zombie Estate 2.exe
+  Zombie Estate 2.exe.config
   steam_api.dll
   BepInEx/
     core/
@@ -105,6 +106,8 @@ BepInEx/LogOutput.log
 ```
 
 If the game reports that `BepInEx.Preloader.Core` could not be loaded, the install is incomplete. Copy the entire `BepInEx` folder from the release zip into the game folder and run `Install_ZE2_ModLoader.bat` again.
+
+If `BepInEx.Preloader.Core.dll` exists but the same error still appears, make sure `Zombie Estate 2.exe.config` is beside `Zombie Estate 2.exe`. That config tells the .NET Framework launcher to probe `BepInEx/core` for BepInEx assemblies.
 
 ## Important Current Behavior
 
