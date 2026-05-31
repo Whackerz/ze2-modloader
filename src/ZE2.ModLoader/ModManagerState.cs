@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace ZE2.BepInExParityBridge
+namespace ZE2.ModLoader
 {
     internal sealed class ModRecord
     {
@@ -139,7 +139,6 @@ namespace ZE2.BepInExParityBridge
         {
             yield return Path.Combine(GameRoot, "Mods");
             yield return Path.Combine(GameRoot, "BepInEx", "plugins", "Mods");
-            yield return Path.Combine(GameRoot, "BepInEx", "plugins", "ZE2.LegacySpriteBridge", "Mods");
         }
 
         private static XDocument LoadState()

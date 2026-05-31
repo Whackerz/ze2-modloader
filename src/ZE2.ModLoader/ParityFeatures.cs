@@ -13,21 +13,20 @@ using HarmonyLib;
 using Microsoft.Xna.Framework;
 using ZombieEstate2;
 
-namespace ZE2.BepInExParityBridge
+namespace ZE2.ModLoader
 {
-    [BepInPlugin("ze2.paritybridge", "ZE2 BepInEx Parity Bridge", "0.1.0")]
-    public sealed class Plugin : BasePlugin
+    internal static class ParityFeatures
     {
         private static ManualLogSource LogSource;
         private static Harmony ParityHarmony;
         private static Type BootstrapType;
 
-        public override void Load()
+        public static void Install(ManualLogSource logSource)
         {
-            LogSource = Log;
+            LogSource = logSource;
             ResolveBootstrap();
 
-            ParityHarmony = new Harmony("ze2.paritybridge");
+            ParityHarmony = new Harmony("ze2.modloader.parity");
             Patch(typeof(Level), ".ctor", new Type[] { typeof(string) }, postfix: "LevelCtorPostfix");
             Patch(typeof(Level), "ThreadLoad", Type.EmptyTypes, prefix: "LevelThreadLoadPrefix");
             Patch(typeof(Player), "InitPlayer", null, postfix: "PlayerInitPostfix");
@@ -43,7 +42,7 @@ namespace ZE2.BepInExParityBridge
             Patch(xboxStore, "ItemHighlighted", null, prefix: "XboxStoreItemHighlightedPrefix");
             Patch(xboxStore, "Close", new Type[] { typeof(object), typeof(EventArgs) }, prefix: "XboxStoreClosePrefix");
 
-            LogSource.LogInfo("ZE2 BepInEx Parity Bridge installed.");
+            LogSource.LogInfo("ZE2 ModLoader parity features installed.");
         }
 
         private static void Patch(Type type, string methodName, Type[] args, string prefix = null, string postfix = null)
@@ -72,30 +71,19 @@ namespace ZE2.BepInExParityBridge
                 return;
             }
 
-            HarmonyMethod pre = prefix == null ? null : new HarmonyMethod(typeof(Plugin).GetMethod(prefix, BindingFlags.Static | BindingFlags.NonPublic));
-            HarmonyMethod post = postfix == null ? null : new HarmonyMethod(typeof(Plugin).GetMethod(postfix, BindingFlags.Static | BindingFlags.NonPublic));
+            HarmonyMethod pre = prefix == null ? null : new HarmonyMethod(typeof(ParityFeatures).GetMethod(prefix, BindingFlags.Static | BindingFlags.NonPublic));
+            HarmonyMethod post = postfix == null ? null : new HarmonyMethod(typeof(ParityFeatures).GetMethod(postfix, BindingFlags.Static | BindingFlags.NonPublic));
             ParityHarmony.Patch(target, pre, post);
             LogSource.LogInfo("Patched " + type.FullName + "." + methodName + ".");
         }
 
         private static void ResolveBootstrap()
         {
-            BootstrapType = AccessTools.TypeByName("ZE2ModLoader.ModBootstrap");
-            if (BootstrapType != null)
-            {
-                return;
-            }
-
-            string bridgePath = Path.Combine(AppContext.BaseDirectory, "BepInEx", "plugins", "ZE2.LegacySpriteBridge", "ZE2ModLoader.dll");
-            if (File.Exists(bridgePath))
-            {
-                Assembly.LoadFrom(bridgePath);
-                BootstrapType = AccessTools.TypeByName("ZE2ModLoader.ModBootstrap");
-            }
+            BootstrapType = typeof(ZE2ModLoader.ModBootstrap);
 
             if (BootstrapType == null)
             {
-                LogSource.LogWarning("ZE2ModLoader.ModBootstrap was not found. Parity bridge hooks will be inert.");
+                LogSource.LogWarning("ZE2ModLoader.ModBootstrap was not found. Parity features will be inert.");
             }
         }
 

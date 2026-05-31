@@ -5,7 +5,7 @@ Current working BepInEx-based modloader for Zombie Estate 2.
 This repository contains:
 
 - `dist/overlay` - files end users copy into a local Zombie Estate 2 folder.
-- `src` - current recovered/adapter source used to build the active DLLs.
+- `src` - current source used to build the active DLLs.
 - `docs` - install, mod authoring, examples, developer notes, and current status.
 - `examples` - copyable example mods for each supported feature.
 
@@ -13,21 +13,12 @@ This repo does **not** include the Zombie Estate 2 game, game content, or Steam 
 
 ## Current Architecture
 
-The loader currently has three runtime pieces:
+The loader now has one primary runtime DLL:
 
 1. `ZE2.ModLoader.dll`
-   - Friend's WIP BepInEx loader, patched so XML mods no longer stage raw files into `Data/*`.
-   - Still handles manifest discovery, character expansion, shop/gun/bullet hooks, DLL mod loading, and some UI/runtime patches.
-
-2. `ZE2.BepInExParityBridge.dll`
-   - Companion BepInEx plugin added during source recovery.
-   - Adds main-menu `Mods`, talent hooks, direct custom map loading, and level asset hooks.
-
-3. `ZE2.LegacySpriteBridge/ZE2ModLoader.dll`
-   - Rebuilt bridge from the archived loader source.
-   - Handles custom sprites, direct map path resolution, custom map assets, custom shadow PNGs, and talent helpers.
-
-When the original WIP source is available, the bridge logic should be merged into the main loader and the adapter layer can be retired.
+   - BepInEx plugin built from source.
+   - Includes the former parity bridge hooks, mod manager UI, direct map loading, custom map assets/shadows, custom sprite handling, talents, XML mod loading, and optional DLL mod loading.
+   - XML mod content is loaded from `Mods` and no longer stages raw files into game `Data/*`.
 
 ## Install
 
@@ -51,7 +42,6 @@ The loader also scans:
 
 ```text
 BepInEx/plugins/Mods
-BepInEx/plugins/ZE2.LegacySpriteBridge/Mods
 ```
 
 For human-authored mods, prefer top-level `Mods`.
@@ -72,7 +62,7 @@ For human-authored mods, prefer top-level `Mods`.
 - Mod enable/disable
 - Mod load order state
 - Basic mod-declared options state
-- Talent point XP and talent store bridge
+- Talent point XP and talent store support
 - Optional DLL mods implementing the loader extension interface
 
 ## Example Mods

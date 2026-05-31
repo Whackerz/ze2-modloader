@@ -5,105 +5,70 @@ Last updated: 2026-05-31
 ## Source Layout
 
 ```text
-src/ZE2.BepInExParityBridge
-src/ZE2.BepInExCorePatcher
-src/ZE2.LegacySpriteBridge
+src/ZE2.ModLoader
+src/ZE2.SampleMods/ZE2.EndlessPlusMod
+src/ZE2.SampleMods/ZE2.ProgressionRevivalMod
 ```
 
 ## Runtime Pieces
 
 ### ZE2.ModLoader.dll
 
-This is the friend's WIP compiled BepInEx loader. The original source is not currently included.
+This is the main BepInEx plugin and now contains the source-merged loader:
 
-Current binary patch:
+- manifest discovery and XML mod loading
+- no raw XML mod asset staging into `Data/*`
+- character/gun/bullet runtime loading
+- sprite atlas merging
+- direct custom map loading
+- custom map tilesheet/light/shadow support
+- main-menu `Mods` manager
+- talent XP/store hooks
+- optional DLL mod loading through `IZe2Mod`
 
-- `Plugin.ApplyMaps` returns `0`
-- `Plugin.ApplyRawFile` returns `0`
+The former `ZE2.BepInExParityBridge.dll`, `ZE2.LegacySpriteBridge/ZE2ModLoader.dll`, and dnlib core patcher are no longer runtime requirements.
 
-This prevents the core loader from copying XML mod files into `Data/*`.
+### Sample DLL Mods
 
-Patch source:
+The sample DLL mods demonstrate the public `IZe2Mod` interface:
 
-```text
-src/ZE2.BepInExCorePatcher
-```
+- `ZE2.EndlessPlusMod`
+- `ZE2.ProgressionRevivalMod`
 
-Backup naming used in the working copy:
-
-```text
-ZE2.ModLoader.dll.pre_direct_maps.bak
-```
-
-Do not ship backup DLLs in releases.
-
-### ZE2.BepInExParityBridge.dll
-
-Companion BepInEx plugin that adds runtime hooks while original source is unavailable.
-
-Main responsibilities:
-
-- Patch `Level` construction and loading.
-- Add main menu `Mods` entry.
-- Add mod manager screens.
-- Route custom map loading through direct mod-folder paths.
-- Route talent XP/store functions through the bridge.
-
-### ZE2.LegacySpriteBridge/ZE2ModLoader.dll
-
-Rebuilt from the archived loader source.
-
-Main responsibilities:
-
-- Discover XML mods across mod roots.
-- Load characters/guns/bullets from mod folders.
-- Merge custom sprites.
-- Resolve custom map files directly from `Mods`.
-- Apply custom map tilesheets/light textures.
-- Apply custom `<MapName>_Shadow.png`.
-- Provide talent helper methods.
+These are buildable source examples for gameplay DLL mods.
 
 ## Build
-
-### Parity Bridge
 
 Run from repo root:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\src\ZE2.BepInExParityBridge\build.ps1 -GameRoot ".\path\to\Zombie Estate 2"
+dotnet build .\src\ZE2.ModLoader\ZE2.ModLoader.csproj -c Release
 ```
 
-The script expects a local game folder with:
+The main project expects a local game folder for compile-time references. By default it looks for:
 
 ```text
-Zombie Estate 2.real.exe
-BepInEx/core/*.dll
-BepInEx/plugins/ZE2.LegacySpriteBridge/ZE2ModLoader.dll
+..\..\..\ze2_bepinexVersion\Zombie Estate 2\Zombie Estate 2.real.exe
 ```
 
-### Legacy Bridge
-
-The archived bridge source uses the local .NET Framework compiler:
+Override the game reference path with:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\src\ZE2.LegacySpriteBridge\build.ps1 -GameExe ".\path\to\Zombie Estate 2\Zombie Estate 2.real.exe"
+dotnet build .\src\ZE2.ModLoader\ZE2.ModLoader.csproj -c Release -p:GameRoot="C:\path\to\Zombie Estate 2"
 ```
 
-The original script was written for the older workspace layout. If building from this repo, verify `GameRoot`/output paths before publishing.
-
-### Core Patcher
+Build sample DLL mods:
 
 ```powershell
-dotnet run --project .\src\ZE2.BepInExCorePatcher\ZE2.BepInExCorePatcher.csproj -- ".\path\to\BepInEx\plugins\ZE2.ModLoader.dll"
+dotnet build .\src\ZE2.SampleMods\ZE2.EndlessPlusMod\ZE2.EndlessPlusMod.csproj -c Release
+dotnet build .\src\ZE2.SampleMods\ZE2.ProgressionRevivalMod\ZE2.ProgressionRevivalMod.csproj -c Release
 ```
 
-## Merge Plan When Original Source Arrives
+Publish the main DLL into the overlay:
 
-1. Move parity bridge hooks into the main BepInEx loader source.
-2. Replace reflection calls to `ZE2ModLoader.ModBootstrap` with direct service calls.
-3. Move direct map loading, custom shadows, custom map assets, and talent helpers into native main-loader code.
-4. Remove the legacy bridge dependency once sprite/map/talent behavior is native.
-5. Remove the binary patcher after `ApplyRawFile`/`ApplyMaps` behavior is implemented in source.
+```powershell
+copy .\src\ZE2.ModLoader\bin\Release\net48\ZE2.ModLoader.dll .\dist\overlay\BepInEx\plugins\ZE2.ModLoader.dll
+```
 
 ## Do Not Commit
 
@@ -120,3 +85,5 @@ Avoid committing:
 - generated `ZE2_MapBridge`
 - `_ManagedFileBackups`
 - `.bak` DLLs
+- `bin/`
+- `obj/`

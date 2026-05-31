@@ -9,8 +9,6 @@ Install:
 What this includes:
 - BepInEx .NET Framework runtime
 - ZE2.ModLoader.dll
-- ZE2.BepInExParityBridge.dll
-- ZE2.LegacySpriteBridge\ZE2ModLoader.dll
 - installer/restore scripts
 - empty top-level Mods folder scaffold
 - ExampleMods folder with copyable sample mods

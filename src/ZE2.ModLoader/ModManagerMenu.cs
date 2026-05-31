@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ZombieEstate2;
 
-namespace ZE2.BepInExParityBridge
+namespace ZE2.ModLoader
 {
     internal sealed class ModManagerMenu : Menu
     {

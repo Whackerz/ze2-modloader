@@ -6,11 +6,11 @@ Last updated: 2026-05-31
 
 Suitable for a source-and-overlay repository release.
 
-This release uses:
+This release uses one main runtime plugin:
 
-- Patched `ZE2.ModLoader.dll`
-- `ZE2.BepInExParityBridge.dll`
-- `ZE2.LegacySpriteBridge/ZE2ModLoader.dll`
+- `ZE2.ModLoader.dll`
+
+The former parity bridge, legacy sprite bridge, and binary core patcher have been merged into main source or retired.
 
 The game's `Data/*` folders should not be modified by XML mod loading. Mods should stay under `Mods`.
 
@@ -18,7 +18,8 @@ The game's `Data/*` folders should not be modified by XML mod loading. Mods shou
 
 - Install/restore overlay scripts.
 - BepInEx runtime overlay.
-- XML mod loading.
+- Source-merged main modloader project.
+- XML mod loading without raw `Data/*` staging.
 - DLL mod loading.
 - Custom characters, guns, bullets.
 - Custom sprites through runtime atlas merge.
@@ -30,16 +31,15 @@ The game's `Data/*` folders should not be modified by XML mod loading. Mods shou
 - Main menu `Mods` manager.
 - Enable/disable and load-order state.
 - Mod option state.
-- Talent XP and talent store bridge.
-- No raw XML mod asset staging into `Data/*`.
+- Talent XP and talent store support.
+- Source-included optional DLL mod examples.
 
 ## Known Risks
 
-- Original WIP source is not included yet.
-- Core loader behavior is partially controlled by a dnlib binary patcher.
 - Mod manager changes require a restart to affect startup-loaded manifests.
 - Broken exported map caches can still crash the game.
-- Generated sprite bridge output is runtime state and should not be committed.
+- Some source names still say `Legacy` from the bridge-era implementation.
+- Generated sprite/map bridge output is runtime state and should not be committed.
 
 ## Backlog
 
@@ -58,6 +58,6 @@ Priority 2:
 
 Priority 3:
 
-- Merge bridge/adapters into the original source once available.
-- Remove binary patcher once core source implements no-staging behavior.
-- Remove legacy bridge dependency once native sprite/map/talent code exists.
+- Rename remaining `Legacy*` internals to current names.
+- Replace reflection calls to `ZE2ModLoader.ModBootstrap` with direct service calls.
+- Split the large main plugin into smaller source files by feature.

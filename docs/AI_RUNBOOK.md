@@ -4,23 +4,23 @@ Last updated: 2026-05-31
 
 ## Mission
 
-Maintain the current BepInEx ZE2 modloader until the original WIP source becomes available.
+Maintain the source-merged BepInEx ZE2 modloader.
 
 ## Key Source Folders
 
 ```text
-src/ZE2.BepInExParityBridge
-src/ZE2.BepInExCorePatcher
-src/ZE2.LegacySpriteBridge
+src/ZE2.ModLoader
+src/ZE2.SampleMods/ZE2.EndlessPlusMod
+src/ZE2.SampleMods/ZE2.ProgressionRevivalMod
 ```
 
 ## Runtime Components
 
 ```text
 BepInEx/plugins/ZE2.ModLoader.dll
-BepInEx/plugins/ZE2.BepInExParityBridge.dll
-BepInEx/plugins/ZE2.LegacySpriteBridge/ZE2ModLoader.dll
 ```
+
+The former parity bridge, legacy sprite bridge, and core binary patcher are retired.
 
 ## Important Design Constraint
 
@@ -28,16 +28,16 @@ Do not restore behavior that copies XML mod files into the game's `Data/*` folde
 
 ## Current Direct Map Path
 
-`ZE2.BepInExParityBridge` patches `Level.ThreadLoad`.
+`src/ZE2.ModLoader/ParityFeatures.cs` patches `Level.ThreadLoad`.
 
-It calls methods on `ZE2ModLoader.ModBootstrap`:
+It calls integrated `ZE2ModLoader.ModBootstrap` methods:
 
 - `HasCustomMap`
 - `GetSectorCount`
 - `ResolveLevelPath`
 - `ApplyLevelAssets`
 
-`ZE2.LegacySpriteBridge` owns direct mod root discovery and path resolution.
+`src/ZE2.ModLoader/ModBootstrap.cs` owns direct mod root discovery and path resolution.
 
 ## Shadow PNG Behavior
 
@@ -48,21 +48,6 @@ It calls methods on `ZE2ModLoader.ModBootstrap`:
 3. direct mod map folder
 
 If no shadow PNG exists for a custom map, it assigns a blank transparent `512x512` texture.
-
-## Core Binary Patch
-
-`ZE2.BepInExCorePatcher` patches the compiled WIP core loader:
-
-- `Plugin.ApplyMaps` -> return `0`
-- `Plugin.ApplyRawFile` -> return `0`
-
-This prevents raw XML mod staging.
-
-Run:
-
-```powershell
-dotnet run --project .\src\ZE2.BepInExCorePatcher\ZE2.BepInExCorePatcher.csproj -- ".\path\to\BepInEx\plugins\ZE2.ModLoader.dll"
-```
 
 ## Common Failure Signatures
 
@@ -82,12 +67,9 @@ Wrong shadows:
 - Add `<MapName>_Shadow.png`.
 - Confirm it is 512x512.
 
-## Merge Plan Later
+## Next Cleanup Targets
 
-When original WIP source arrives:
-
-1. Move parity bridge patches into main loader source.
-2. Move legacy bridge direct loaders into main loader services.
-3. Replace reflection calls with direct calls.
-4. Remove binary patcher.
-5. Remove legacy bridge DLL once all behavior is native.
+1. Rename remaining `Legacy*` internal symbols.
+2. Replace reflection calls to `ZE2ModLoader.ModBootstrap` with direct service calls.
+3. Split the large main plugin source into feature files.
+4. Add strict manifest and map cache validation.

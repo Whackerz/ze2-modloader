@@ -70,9 +70,8 @@ Expected markers:
 
 ```text
 Loading [ZE2 ModLoader 2.4.1]
-Loading [ZE2 BepInEx Parity Bridge 0.1.0]
-ZE2 BepInEx Parity Bridge installed.
-Legacy bridge methods resolved.
+ZE2 ModLoader parity features installed.
+Integrated bridge methods resolved.
 Legacy sprite merge initialization invoked.
 ```
 
