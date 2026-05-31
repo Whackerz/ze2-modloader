@@ -82,7 +82,14 @@ This is the richest example, but it is intentionally less minimal than the singl
 
 Contains `ZE2.EndlessPlusMod.dll`, a compiled optional DLL mod example.
 
-Source for this particular sample DLL is not currently included in this repository.
+DLL mods are installed under `BepInEx/plugins/Mods/` and are meant for runtime behavior changes that XML content mods cannot express.
+
+Included source examples:
+
+- `src/ZE2.SampleMods/ZE2.EndlessPlusMod` - custom game mode and wave behavior example.
+- `src/ZE2.SampleMods/ZE2.ProgressionRevivalMod` - larger progression/menu/HUD behavior example.
+
+See `DLL_MODS.md` for the full authoring guide.
 
 ## Recommended Testing Order
 

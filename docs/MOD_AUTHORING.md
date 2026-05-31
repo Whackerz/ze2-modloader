@@ -67,6 +67,18 @@ OptionalDllMods
 
 See `EXAMPLES.md` for the feature demonstrated by each folder. These examples are meant to be copied into the game's top-level `Mods` folder one at a time while learning.
 
+## DLL Mods
+
+XML content mods are best for characters, guns, bullets, maps, map textures, shadows, and simple configuration. Use a DLL mod when the mod needs to change runtime behavior, such as custom game modes, wave rules, progression, menus, UI drawing, enemy behavior, or deeper gameplay systems.
+
+DLL mods are loaded from:
+
+```text
+BepInEx/plugins/Mods/*.dll
+```
+
+See `DLL_MODS.md` for the `IZe2Mod` interface, project setup, Harmony patching pattern, and the included custom game mode examples.
+
 ## Custom Maps
 
 Map prefixes should be simple and safe:

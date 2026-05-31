@@ -12,6 +12,6 @@ Start with:
 
 `Example_ShowerForgePack` is an all-in-one content pack that demonstrates several systems together.
 
-`OptionalDllMods` contains a compiled optional DLL mod example.
+`OptionalDllMods` contains a compiled optional DLL mod example. Its source examples live in `../src/ZE2.SampleMods/`.
 
-For details, read `../docs/EXAMPLES.md`.
+For details, read `../docs/EXAMPLES.md` and `../docs/DLL_MODS.md`.
