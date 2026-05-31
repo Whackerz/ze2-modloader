@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BulletStats xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <DeathParticleType>Sparks</DeathParticleType>
+  <Name>NebulaSpike</Name>
+  <VertTexCoord>
+    <X>8</X>
+    <Y>5</Y>
+  </VertTexCoord>
+  <HorizTexCoord>
+    <X>8</X>
+    <Y>5</Y>
+  </HorizTexCoord>
+  <Speed>24</Speed>
+  <BehaviorsStrings>
+    <string>Straight, 1.0, 0.0, 0.0, 1.0</string>
+  </BehaviorsStrings>
+  <PersistOnDeath>false</PersistOnDeath>
+  <PersistTime>0</PersistTime>
+  <RandomZRotation>false</RandomZRotation>
+  <RotatesInDirection>true</RotatesInDirection>
+  <XRotationOverTime>0</XRotationOverTime>
+  <YRotationOverTime>0</YRotationOverTime>
+  <ZRotationOverTime>0</ZRotationOverTime>
+  <RandomSpeedPercent>0</RandomSpeedPercent>
+  <RandomFour>false</RandomFour>
+  <NoGore>false</NoGore>
+  <LiveTime>1.05</LiveTime>
+  <EmitPartTime>0.08</EmitPartTime>
+  <Scale>0.5</Scale>
+  <IgnoreEnemies>false</IgnoreEnemies>
+  <HurtsPlayers>false</HurtsPlayers>
+  <LandOnFloor>false</LandOnFloor>
+</BulletStats>

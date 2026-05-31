@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BepInEx.NET.Framework.Launcher</name>
+    </assembly>
+    <members>
+        <member name="T:BepInEx.NET.Shared.LocalUtility">
+            <summary>
+                Generic helper properties and methods.
+            </summary>
+        </member>
+        <member name="M:BepInEx.NET.Shared.LocalUtility.TryResolveDllAssembly``1(System.Reflection.AssemblyName,System.String,System.Func{System.String,``0},``0@)">
+            <summary>
+                Try to resolve and load the given assembly DLL.
+            </summary>
+            <param name="assemblyName">Name of the assembly, of the type <see cref="T:System.Reflection.AssemblyName" />.</param>
+            <param name="directory">Directory to search the assembly from.</param>
+            <param name="assembly">The loaded assembly.</param>
+            <returns>True, if the assembly was found and loaded. Otherwise, false.</returns>
+        </member>
+        <member name="M:BepInEx.NET.Shared.LocalUtility.TryResolveDllAssembly(System.Reflection.AssemblyName,System.String,System.Reflection.Assembly@)">
+            <summary>
+                Try to resolve and load the given assembly DLL.
+            </summary>
+            <param name="assemblyName">Name of the assembly, of the type <see cref="T:System.Reflection.AssemblyName" />.</param>
+            <param name="directory">Directory to search the assembly from.</param>
+            <param name="assembly">The loaded assembly.</param>
+            <returns>True, if the assembly was found and loaded. Otherwise, false.</returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,23 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.pdb
+*.bak
+*.tmp
+*.log
+BepInEx/LogOutput.log
+Logs/
+SaveData/
+Content/
+Data/
+Zombie Estate 2.exe
+Zombie Estate 2.real.exe
+steam_api.dll
+Steamworks.NET.dll
+CSteamworks.dll
+dist/overlay/BepInEx/cache/
+dist/overlay/BepInEx/plugins/Mods/_ManagedFileBackups/
+dist/overlay/Mods/ZE2_SpriteBridge/
+dist/overlay/Mods/ZE2_MapBridge/

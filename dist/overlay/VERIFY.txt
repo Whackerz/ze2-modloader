@@ -1,0 +1,19 @@
+Verification Checklist
+
+1. Run Install_ZE2_ModLoader.bat successfully.
+2. Launch Zombie Estate 2.exe.
+3. Confirm BepInEx\LogOutput.log contains:
+   - Loading [ZE2 ModLoader 2.4.1]
+   - Loading [ZE2 BepInEx Parity Bridge 0.1.0]
+   - ZE2 BepInEx Parity Bridge installed.
+   - Legacy bridge methods resolved.
+   - Legacy sprite merge initialization invoked.
+4. Confirm the main menu has a Mods entry.
+5. Confirm Data\Levels, Data\Guns, and Data\Bullets are not filled with mod files after startup.
+
+If loader does not start:
+- Ensure Zombie Estate 2.real.exe exists beside Zombie Estate 2.exe.
+- Ensure BepInEx\core exists.
+- Ensure BepInEx\plugins\ZE2.ModLoader.dll exists.
+- Ensure BepInEx\plugins\ZE2.BepInExParityBridge.dll exists.
+- Ensure BepInEx\plugins\ZE2.LegacySpriteBridge\ZE2ModLoader.dll exists.

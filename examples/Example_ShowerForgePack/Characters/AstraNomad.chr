@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CharacterSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <hatOffset>
+    <X>0</X>
+    <Y>0</Y>
+  </hatOffset>
+  <name>Astra Nomad</name>
+  <texCoord>
+    <X>0</X>
+    <Y>0</Y>
+  </texCoord>
+  <description>A cosmic drifter who sketches star trails into lethal geometry.</description>
+  <startingGun>Nebula Quill</startingGun>
+  <superWeapon>Nuke Gun</superWeapon>
+  <Properties>
+    <Speed>4.0</Speed>
+    <BulletDamageMod>2</BulletDamageMod>
+    <MeleeDamageMod>0</MeleeDamageMod>
+    <LifeStealPercent>0</LifeStealPercent>
+    <CritChance>6</CritChance>
+    <MaxHealth>110</MaxHealth>
+    <Armor>2</Armor>
+    <FireResist>0</FireResist>
+    <WaterResist>0</WaterResist>
+    <EarthResist>0</EarthResist>
+    <AllResist>0</AllResist>
+    <HealRecievedMod>0</HealRecievedMod>
+    <HealingDoneMod>0</HealingDoneMod>
+    <HealOverTime>0</HealOverTime>
+    <HealOnHitPercent>0</HealOnHitPercent>
+    <HealOnHitAmount>0</HealOnHitAmount>
+    <ExplosionRadiusMod>0</ExplosionRadiusMod>
+    <ExplosionDamageMod>0</ExplosionDamageMod>
+    <ReloadTimeMod>0</ReloadTimeMod>
+    <ShotTimeMod>-5</ShotTimeMod>
+    <SwingTimeMod>0</SwingTimeMod>
+    <NumBulletsMod>0</NumBulletsMod>
+    <GunCostMod>0</GunCostMod>
+    <MinionDmgMod>0</MinionDmgMod>
+    <MinionFireRateMod>0</MinionFireRateMod>
+    <MinionAmmoMod>0</MinionAmmoMod>
+    <Ammo_Shells>0</Ammo_Shells>
+    <Ammo_Assault>0</Ammo_Assault>
+    <Ammo_Explosive>0</Ammo_Explosive>
+    <Ammo_Heavy>0</Ammo_Heavy>
+    <ChanceOfArmorOnHeal>0</ChanceOfArmorOnHeal>
+    <ArmorGainedOnChanceOnHeal>0</ArmorGainedOnChanceOnHeal>
+    <HealthPackStorageBonus>0</HealthPackStorageBonus>
+    <MoneyBonus>0</MoneyBonus>
+    <MagnetBonus>0</MagnetBonus>
+  </Properties>
+  <PointsToUnlock>0</PointsToUnlock>
+</CharacterSettings>
