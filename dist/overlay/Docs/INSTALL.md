@@ -109,6 +109,8 @@ If the game reports that `BepInEx.Preloader.Core` could not be loaded, the insta
 
 If `BepInEx.Preloader.Core.dll` exists but the same error still appears, make sure `Zombie Estate 2.exe.config` is beside `Zombie Estate 2.exe`. That config tells the .NET Framework launcher to probe `BepInEx/core` for BepInEx assemblies.
 
+If the game reports `Operation is not supported` or says an assembly was loaded from a network location, Windows has blocked one or more downloaded DLLs. Right-click the zip before extracting, choose `Properties`, check `Unblock`, then extract again. The included `Zombie Estate 2.exe.config` also enables `.NET Framework` `loadFromRemoteSources` for this launcher path.
+
 ## Important Current Behavior
 
 The current distribution is configured to avoid staging mod files into the game `Data/*` folders.

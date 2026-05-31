@@ -11,6 +11,9 @@ Install:
 5. Run Install_ZE2_ModLoader.bat once from the game folder.
 6. Launch with Zombie Estate 2.exe.
 
+If Windows blocks downloaded DLLs, right-click the zip before extracting,
+choose Properties, check Unblock, then extract again.
+
 What this includes:
 - BepInEx .NET Framework runtime
 - ZE2.ModLoader.dll

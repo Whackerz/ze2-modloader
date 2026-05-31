@@ -17,4 +17,5 @@ If the game does not launch:
 - Ensure BepInEx\core\0Harmony.dll exists.
 - Ensure Zombie Estate 2.real.exe exists beside Zombie Estate 2.exe.
 - Ensure BepInEx\plugins\ZE2.ModLoader.dll exists.
+- If the log says Operation is not supported or network location, unblock the zip/DLLs.
 - Check BepInEx\LogOutput.log and Mods\ZE2ModLoader.log.
