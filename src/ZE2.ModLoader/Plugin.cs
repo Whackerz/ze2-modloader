@@ -1007,21 +1007,34 @@ namespace ZE2.ModLoader
 
         private void LoadDllMods()
         {
-            var dlls = Directory.GetFiles(modsRoot, "*.dll", SearchOption.TopDirectoryOnly);
+            var pluginRoot = Path.Combine(gameRoot, "BepInEx", "plugins");
+            var dlls = Directory.GetFiles(modsRoot, "*.dll", SearchOption.TopDirectoryOnly)
+                .Concat(Directory.GetFiles(pluginRoot, "*.dll", SearchOption.TopDirectoryOnly))
+                .Where(path => !string.Equals(Path.GetFileName(path), "ZE2.ModLoader.dll", StringComparison.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
             if (dlls.Length == 0)
+            {
+                log.LogInfo($"No DLL mods found. Searched '{modsRoot}' and '{pluginRoot}'.");
                 return;
+            }
 
             foreach (var dll in dlls)
             {
                 try
                 {
                     var asm = System.Reflection.Assembly.LoadFrom(dll);
+                    var loadedAny = false;
                     foreach (var t in asm.GetTypes().Where(t => typeof(IZe2Mod).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface))
                     {
                         var mod = (IZe2Mod)Activator.CreateInstance(t);
                         mod.OnLoad();
-                        log.LogInfo($"Loaded mod: {mod.Name} v{mod.Version}");
+                        loadedAny = true;
+                        log.LogInfo($"Loaded DLL mod: {mod.Name} v{mod.Version} from {Path.GetFileName(dll)}");
                     }
+
+                    if (!loadedAny)
+                        log.LogInfo($"Skipped DLL without IZe2Mod implementation: {Path.GetFileName(dll)}");
                 }
                 catch (Exception ex)
                 {

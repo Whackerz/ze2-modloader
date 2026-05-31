@@ -10,7 +10,10 @@ DLL mods are for behavior changes that cannot be expressed with XML content. Use
 
 ```text
 BepInEx/plugins/Mods/*.dll
+BepInEx/plugins/*.dll
 ```
+
+The dedicated `BepInEx/plugins/Mods` folder is preferred for user-created DLL mods, but bare `BepInEx/plugins` is also supported for convenience.
 
 For each DLL, it finds public or internal non-abstract classes that implement:
 
@@ -172,6 +175,14 @@ Build the mod, then copy the compiled DLL to:
 ```text
 BepInEx/plugins/Mods/MyCoolMode.dll
 ```
+
+This also works:
+
+```text
+BepInEx/plugins/MyCoolMode.dll
+```
+
+Prefer `BepInEx/plugins/Mods` if you want custom DLL mods grouped separately from the main loader.
 
 Restart the game. Check:
 

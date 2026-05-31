@@ -75,6 +75,7 @@ DLL mods are loaded from:
 
 ```text
 BepInEx/plugins/Mods/*.dll
+BepInEx/plugins/*.dll
 ```
 
 See `DLL_MODS.md` for the `IZe2Mod` interface, project setup, Harmony patching pattern, and the included custom game mode examples.

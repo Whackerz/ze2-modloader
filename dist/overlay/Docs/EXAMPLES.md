@@ -82,7 +82,7 @@ This is the richest example, but it is intentionally less minimal than the singl
 
 Contains `ZE2.EndlessPlusMod.dll`, a compiled optional DLL mod example.
 
-DLL mods are installed under `BepInEx/plugins/Mods/` and are meant for runtime behavior changes that XML content mods cannot express.
+DLL mods are installed under `BepInEx/plugins/Mods/` or `BepInEx/plugins/` and are meant for runtime behavior changes that XML content mods cannot express. The dedicated `Mods` subfolder is preferred.
 
 Included source examples:
 

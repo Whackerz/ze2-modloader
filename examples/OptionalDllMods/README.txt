@@ -5,7 +5,11 @@ Install optional DLL mods by placing them in:
 
 BepInEx/plugins/Mods/
 
-The loader scans BepInEx/plugins/Mods/*.dll for classes that implement:
+or:
+
+BepInEx/plugins/
+
+The loader scans both folders for classes that implement:
 
 ZE2.ModLoader.IZe2Mod
 
