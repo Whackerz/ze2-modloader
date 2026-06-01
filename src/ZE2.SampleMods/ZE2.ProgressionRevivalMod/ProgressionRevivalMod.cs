@@ -493,7 +493,7 @@ namespace ZE2.ProgressionRevivalMod
                     IsCountGetter(codes[i]) &&
                     codes[i + 1].opcode == OpCodes.Ldc_I4_2)
                 {
-                    codes[i + 1] = new CodeInstruction(OpCodes.Ldloc_1);
+                    codes[i + 1] = new CodeInstruction(OpCodes.Ldarg_S, 5);
                     codes.Insert(i + 2, new CodeInstruction(OpCodes.Call, helper));
                     patched = true;
                     i++;
@@ -518,10 +518,21 @@ namespace ZE2.ProgressionRevivalMod
 
         private static int GetMinionLimitForComparison(object player)
         {
-            var directCount = ToInt(playerMinionCountField?.GetValue(player));
-            var talentProps = playerTalentSpecPropsField?.GetValue(player);
-            var talentCount = ToInt(specialPropertiesMinionCountProperty?.GetValue(talentProps, null));
-            return Math.Max(2, Math.Max(directCount, talentCount + 1));
+            try
+            {
+                if (player == null || playerType == null || !playerType.IsInstanceOfType(player))
+                    return 2;
+
+                var directCount = ToInt(playerMinionCountField?.GetValue(player));
+                var talentProps = playerTalentSpecPropsField?.GetValue(player);
+                var talentCount = ToInt(specialPropertiesMinionCountProperty?.GetValue(talentProps, null));
+                return Math.Max(2, Math.Max(directCount, talentCount + 1));
+            }
+            catch (Exception ex)
+            {
+                LogWarn($"Minion limit lookup failed; using stock cap. {ex.Message}");
+                return 2;
+            }
         }
 
         private static void ApplyPostTalentFixups(object talent, object player)
