@@ -9,6 +9,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -40,6 +42,10 @@ namespace ZE2.ModLoader
         private readonly List<LegacySpriteBinding> pendingCharacterSpriteBindings = new List<LegacySpriteBinding>();
         private readonly List<LegacySpriteBinding> pendingGunSpriteBindings = new List<LegacySpriteBinding>();
         private readonly List<LegacySpriteBinding> pendingBulletSpriteBindings = new List<LegacySpriteBinding>();
+        private static ManualLogSource staticLog;
+        private static string multiplayerGameRoot;
+        private static string multiplayerModsRoot;
+        private static string multiplayerLegacyModsRoot;
         private static readonly HashSet<string> BaseMapPrefixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "Estate",
@@ -67,9 +73,13 @@ namespace ZE2.ModLoader
         public override void Load()
         {
             log = Log;
+            staticLog = Log;
             gameRoot = Path.GetFullPath(AppContext.BaseDirectory);
             modsRoot = Path.Combine(gameRoot, "BepInEx", "plugins", "Mods");
             legacyModsRoot = Path.Combine(gameRoot, "Mods");
+            multiplayerGameRoot = gameRoot;
+            multiplayerModsRoot = modsRoot;
+            multiplayerLegacyModsRoot = legacyModsRoot;
             characterBackupRoot = Path.Combine(modsRoot, "_CharacterBackups");
             managedFilesStatePath = Path.Combine(gameRoot, "BepInEx", "plugins", "ZE2.ModLoader.managedfiles.txt");
             managedBackupRoot = Path.Combine(modsRoot, "_ManagedFileBackups");
@@ -99,7 +109,276 @@ namespace ZE2.ModLoader
                 pendingSpriteBoundBulletNames);
             CharacterExpansionPatches.Install(harmony);
             ParityFeatures.Install(log);
+            InstallMultiplayerModSyncPatches();
             LoadDllMods();
+        }
+
+        private void InstallMultiplayerModSyncPatches()
+        {
+            try
+            {
+                var lobbyManager = AccessTools.TypeByName("ZombieEstate2.Networking.LobbyManager");
+                if (lobbyManager == null)
+                {
+                    log.LogWarning("Multiplayer mod sync skipped: LobbyManager type was unavailable.");
+                    return;
+                }
+
+                PatchLobbyMethod(lobbyManager, "SetInitialLobbyData", postfix: nameof(PublishLobbyModSignaturePostfix));
+                PatchLobbyMethod(lobbyManager, "SetLobbyData", postfix: nameof(PublishLobbyModSignaturePostfix));
+                PatchLobbyMethod(lobbyManager, "BeginSearchForLobby", prefix: nameof(AddLobbyModSearchFilterPrefix));
+                PatchLobbyMethod(lobbyManager, "ConfirmVersions", postfix: nameof(ConfirmLobbyModSignaturePostfix));
+                log.LogInfo("Multiplayer mod signature sync patches installed.");
+            }
+            catch (Exception ex)
+            {
+                log.LogWarning("Multiplayer mod sync patch install failed: " + ex.Message);
+            }
+        }
+
+        private void PatchLobbyMethod(Type type, string name, string prefix = null, string postfix = null)
+        {
+            var method = AccessTools.Method(type, name);
+            if (method == null)
+            {
+                log.LogWarning("Multiplayer mod sync skipped missing method: " + name);
+                return;
+            }
+
+            harmony.Patch(
+                method,
+                prefix == null ? null : new HarmonyMethod(typeof(Plugin).GetMethod(prefix, BindingFlags.Static | BindingFlags.NonPublic)),
+                postfix == null ? null : new HarmonyMethod(typeof(Plugin).GetMethod(postfix, BindingFlags.Static | BindingFlags.NonPublic)));
+        }
+
+        private static void PublishLobbyModSignaturePostfix(object __instance)
+        {
+            try
+            {
+                var signature = BuildModSignature();
+                var lobbyId = GetInstanceField(__instance, "mLobbyID");
+                if (lobbyId == null)
+                    return;
+
+                if (SetSteamLobbyData(lobbyId, "ze2_mod_hash", signature.Hash) &&
+                    SetSteamLobbyData(lobbyId, "ze2_mod_count", signature.Count.ToString()) &&
+                    SetSteamLobbyData(lobbyId, "ze2_mod_list", signature.DisplayList))
+                {
+                    staticLog?.LogInfo("Published lobby mod signature: " + signature.Hash + " (" + signature.Count + " item(s)).");
+                }
+            }
+            catch (Exception ex)
+            {
+                staticLog?.LogWarning("Publishing lobby mod signature failed: " + ex.Message);
+            }
+        }
+
+        private static void AddLobbyModSearchFilterPrefix()
+        {
+            try
+            {
+                var signature = BuildModSignature();
+                if (signature.Count <= 0)
+                    return;
+
+                AddSteamLobbyStringFilter("ze2_mod_hash", signature.Hash);
+                staticLog?.LogInfo("Added lobby browser mod signature filter: " + signature.Hash);
+            }
+            catch (Exception ex)
+            {
+                staticLog?.LogWarning("Adding lobby mod filter failed: " + ex.Message);
+            }
+        }
+
+        private static void ConfirmLobbyModSignaturePostfix(object __instance)
+        {
+            try
+            {
+                var lobbyId = GetInstanceField(__instance, "mLobbyID");
+                if (lobbyId == null)
+                    return;
+
+                var remoteHash = GetSteamLobbyData(lobbyId, "ze2_mod_hash");
+                var remoteList = GetSteamLobbyData(lobbyId, "ze2_mod_list");
+                var local = BuildModSignature();
+                if (string.IsNullOrWhiteSpace(remoteHash))
+                {
+                    if (local.Count > 0)
+                        WriteTerminal("Host did not publish a ZE2 mod signature. Multiplayer mods may be mismatched.");
+                    return;
+                }
+
+                if (!string.Equals(remoteHash, local.Hash, StringComparison.OrdinalIgnoreCase))
+                {
+                    WriteTerminal("ZE2 mod mismatch. Host mods: " + remoteList + " | Local mods: " + local.DisplayList);
+                    staticLog?.LogWarning("ZE2 mod mismatch. Host hash " + remoteHash + "; local hash " + local.Hash + ".");
+                }
+                else
+                {
+                    staticLog?.LogInfo("Lobby mod signature matched host: " + local.Hash + ".");
+                }
+            }
+            catch (Exception ex)
+            {
+                staticLog?.LogWarning("Confirming lobby mod signature failed: " + ex.Message);
+            }
+        }
+
+        private sealed class ModSignature
+        {
+            public string Hash;
+            public int Count;
+            public string DisplayList;
+        }
+
+        private static ModSignature BuildModSignature()
+        {
+            var entries = new List<string>();
+            AddManifestSignatures(entries, multiplayerLegacyModsRoot, "Mods");
+            AddManifestSignatures(entries, multiplayerModsRoot, "BepInEx/plugins/Mods");
+            AddDllSignatures(entries, Path.Combine(multiplayerGameRoot ?? string.Empty, "BepInEx", "plugins"), false);
+            AddDllSignatures(entries, multiplayerModsRoot, true);
+            entries.Sort(StringComparer.OrdinalIgnoreCase);
+
+            var joined = string.Join("|", entries.ToArray());
+            return new ModSignature
+            {
+                Hash = entries.Count == 0 ? "none" : Sha256String(joined),
+                Count = entries.Count,
+                DisplayList = TruncateForLobbyData(entries.Count == 0 ? "none" : string.Join(", ", entries.ToArray()), 950)
+            };
+        }
+
+        private static void AddManifestSignatures(List<string> entries, string root, string label)
+        {
+            if (string.IsNullOrEmpty(root) || !Directory.Exists(root))
+                return;
+
+            foreach (var manifest in Directory.GetFiles(root, "mod.xml", SearchOption.AllDirectories))
+            {
+                var dir = Path.GetDirectoryName(manifest);
+                var name = string.IsNullOrEmpty(dir) ? Path.GetFileNameWithoutExtension(manifest) : Path.GetFileName(dir);
+                if (name != null && name.StartsWith("_", StringComparison.Ordinal))
+                    continue;
+
+                entries.Add("xml:" + label + "/" + name + ":" + HashDirectory(dir));
+            }
+        }
+
+        private static void AddDllSignatures(List<string> entries, string root, bool includeAll)
+        {
+            if (string.IsNullOrEmpty(root) || !Directory.Exists(root))
+                return;
+
+            foreach (var dll in Directory.GetFiles(root, "*.dll", SearchOption.TopDirectoryOnly))
+            {
+                var fileName = Path.GetFileName(dll);
+                if (!includeAll && string.Equals(fileName, "ZE2.ModLoader.dll", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                entries.Add("dll:" + fileName + ":" + HashFile(dll));
+            }
+        }
+
+        private static string HashDirectory(string dir)
+        {
+            if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir))
+                return "missing";
+
+            var parts = new List<string>();
+            foreach (var file in Directory.GetFiles(dir, "*", SearchOption.AllDirectories))
+            {
+                var name = Path.GetFileName(file);
+                if (name.Equals("ZE2ModLoader.log", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var rel = file.Substring(dir.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Replace('\\', '/');
+                parts.Add(rel + "=" + HashFile(file));
+            }
+
+            parts.Sort(StringComparer.OrdinalIgnoreCase);
+            return Sha256String(string.Join("|", parts.ToArray()));
+        }
+
+        private static string HashFile(string path)
+        {
+            try
+            {
+                using (var sha = SHA256.Create())
+                using (var stream = File.OpenRead(path))
+                    return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", string.Empty).ToLowerInvariant();
+            }
+            catch
+            {
+                return "unreadable";
+            }
+        }
+
+        private static string Sha256String(string value)
+        {
+            using (var sha = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(value ?? string.Empty);
+                return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", string.Empty).ToLowerInvariant();
+            }
+        }
+
+        private static string TruncateForLobbyData(string value, int max)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= max)
+                return value ?? string.Empty;
+
+            return value.Substring(0, Math.Max(0, max - 3)) + "...";
+        }
+
+        private static object GetInstanceField(object instance, string fieldName)
+        {
+            if (instance == null)
+                return null;
+
+            var field = AccessTools.Field(instance.GetType(), fieldName);
+            return field == null ? null : field.GetValue(instance);
+        }
+
+        private static bool SetSteamLobbyData(object lobbyId, string key, string value)
+        {
+            var steamMatchmaking = AccessTools.TypeByName("Steamworks.SteamMatchmaking");
+            var method = steamMatchmaking == null ? null : AccessTools.Method(steamMatchmaking, "SetLobbyData", new[] { lobbyId.GetType(), typeof(string), typeof(string) });
+            if (method == null)
+                return false;
+
+            return (bool)method.Invoke(null, new[] { lobbyId, key, value ?? string.Empty });
+        }
+
+        private static string GetSteamLobbyData(object lobbyId, string key)
+        {
+            var steamMatchmaking = AccessTools.TypeByName("Steamworks.SteamMatchmaking");
+            var method = steamMatchmaking == null ? null : AccessTools.Method(steamMatchmaking, "GetLobbyData", new[] { lobbyId.GetType(), typeof(string) });
+            return method == null ? string.Empty : (string)method.Invoke(null, new[] { lobbyId, key });
+        }
+
+        private static void AddSteamLobbyStringFilter(string key, string value)
+        {
+            var steamMatchmaking = AccessTools.TypeByName("Steamworks.SteamMatchmaking");
+            var comparisonType = AccessTools.TypeByName("Steamworks.ELobbyComparison");
+            var method = steamMatchmaking == null || comparisonType == null
+                ? null
+                : AccessTools.Method(steamMatchmaking, "AddRequestLobbyListStringFilter", new[] { typeof(string), typeof(string), comparisonType });
+            if (method == null)
+                return;
+
+            var equal = Enum.Parse(comparisonType, "k_ELobbyComparisonEqual");
+            method.Invoke(null, new[] { key, value, equal });
+        }
+
+        private static void WriteTerminal(string message)
+        {
+            var terminal = AccessTools.TypeByName("ZombieEstate2.Terminal");
+            var method = terminal == null ? null : AccessTools.Method(terminal, "WriteMessage", new[] { typeof(string) });
+            if (method != null)
+                method.Invoke(null, new object[] { message });
+
+            staticLog?.LogWarning(message);
         }
 
         private HashSet<string> LoadCharacterSlots()

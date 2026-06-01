@@ -1,6 +1,7 @@
 Optional DLL Mods
 
-ZE2.EndlessPlusMod.dll is an example compiled BepInEx/plugin-side mod.
+ZE2.EndlessPlusMod.dll is an example compiled BepInEx/plugin-side mod for custom game modes.
+ZE2.ProgressionRevivalMod.dll is an example compiled BepInEx/plugin-side mod for XP/talents/progression.
 Install optional DLL mods by placing them in:
 
 BepInEx/plugins/Mods/

@@ -17,6 +17,7 @@ Last updated: 2026-05-31
 - Mod enable/disable, load order state, and option state.
 - Talent XP and Xbox talent store support.
 - Optional DLL mod loading through `IZe2Mod`.
+- Multiplayer lobby mod signature publishing/filtering for clients with matching mod sets.
 - Source-included optional DLL mod examples.
 
 ## Known Limits

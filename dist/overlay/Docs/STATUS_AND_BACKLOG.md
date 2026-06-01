@@ -12,6 +12,8 @@ This release uses one main runtime plugin:
 
 The former parity bridge, legacy sprite bridge, and binary core patcher have been merged into main source or retired.
 
+Current multiplayer support publishes a mod signature into Steam lobby data and filters public lobby searches to matching mod sets. It does not transfer mod files between machines.
+
 The game's `Data/*` folders should not be modified by XML mod loading. Mods should stay under `Mods`.
 
 ## Done

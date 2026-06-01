@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using ZE2.ModLoader;
 
@@ -62,6 +63,7 @@ namespace ZE2.ProgressionRevivalMod
         private static MethodInfo shadowDrawStringMethod;
         private static MethodInfo spriteBatchDrawRectMethod;
         private static MethodInfo vector2MeasureStringMethod;
+        private static MethodInfo playerFireUpdatePropertiesMethod;
 
         private static ConstructorInfo vector2Ctor;
         private static ConstructorInfo rectangleCtor;
@@ -76,6 +78,9 @@ namespace ZE2.ProgressionRevivalMod
         private static FieldInfo vector2YField;
 
         private static PropertyInfo localOwnershipProperty;
+        private static FieldInfo playerMinionCountField;
+        private static FieldInfo playerTalentSpecPropsField;
+        private static PropertyInfo specialPropertiesMinionCountProperty;
 
         private sealed class ProgressionState
         {
@@ -134,7 +139,13 @@ namespace ZE2.ProgressionRevivalMod
 
             playerLevelUpMethod = AccessTools.Method(playerType, "LevelUp");
             playerGetIndexMethod = AccessTools.Method(playerType, "get_Index");
+            playerFireUpdatePropertiesMethod = AccessTools.Method(playerType, "FireUpdateProperties");
             localOwnershipProperty = AccessTools.Property(playerType, "IAmOwnedByLocalPlayer");
+            playerMinionCountField = AccessTools.Field(playerType, "MinionCount");
+            playerTalentSpecPropsField = AccessTools.Field(playerType, "TalentSpecProps");
+
+            var specialPropertiesType = AccessTools.TypeByName("ZombieEstate2.SpecialProperties");
+            specialPropertiesMinionCountProperty = AccessTools.Property(specialPropertiesType, "MinionCount");
 
             playerStatsGetTalentPointsMethod = AccessTools.Method(playerStatsType, "GetTalentPoints");
             playerStatsAddTalentPointsMethod = AccessTools.Method(playerStatsType, "AddTalentPoints", new[] { typeof(int) });
@@ -146,6 +157,10 @@ namespace ZE2.ProgressionRevivalMod
             var talentManagerType = AccessTools.TypeByName("ZombieEstate2.TalentManager");
             var talentType = AccessTools.TypeByName("ZombieEstate2.Talent");
             talentApplyMethod = AccessTools.Method(talentManagerType, "ApplyTalent", new[] { talentType, playerType });
+
+            var bulletCreatorType = AccessTools.TypeByName("ZombieEstate2.BulletCreator");
+            PatchMethod(bulletCreatorType, "BulletsFired",
+                transpiler: new HarmonyMethod(typeof(ProgressionRevivalMod).GetMethod(nameof(BulletsFiredTranspiler), BindingFlags.Static | BindingFlags.NonPublic)));
 
             var soundEngineType = AccessTools.TypeByName("ZombieEstate2.SoundEngine");
             soundPlayMethod = AccessTools.Method(soundEngineType, "PlaySound", new[] { typeof(string), typeof(float) });
@@ -205,7 +220,7 @@ namespace ZE2.ProgressionRevivalMod
             }
         }
 
-        private static void PatchMethod(Type type, string name, HarmonyMethod prefix = null, HarmonyMethod postfix = null)
+        private static void PatchMethod(Type type, string name, HarmonyMethod prefix = null, HarmonyMethod postfix = null, HarmonyMethod transpiler = null)
         {
             if (type == null)
             {
@@ -220,7 +235,7 @@ namespace ZE2.ProgressionRevivalMod
                 return;
             }
 
-            HarmonyInstance.Patch(method, prefix, postfix);
+            HarmonyInstance.Patch(method, prefix, postfix, transpiler);
             LogInfo($"Patched {type.FullName}.{name}.");
         }
 
@@ -461,8 +476,83 @@ namespace ZE2.ProgressionRevivalMod
 
             playerStatsAddTalentPointsMethod?.Invoke(stats, new object[] { -1 });
             talentApplyMethod?.Invoke(null, new[] { talent, player });
+            ApplyPostTalentFixups(talent, player);
             PlaySound("ze2_upgrade", 0.65f);
             RefreshTalentMenu(menu);
+        }
+
+        private static IEnumerable<CodeInstruction> BulletsFiredTranspiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+            var helper = typeof(ProgressionRevivalMod).GetMethod(nameof(GetMinionLimitForComparison), BindingFlags.Static | BindingFlags.NonPublic);
+            var patched = false;
+
+            for (var i = 0; i < codes.Count - 1; i++)
+            {
+                if (!patched &&
+                    IsCountGetter(codes[i]) &&
+                    codes[i + 1].opcode == OpCodes.Ldc_I4_2)
+                {
+                    codes[i + 1] = new CodeInstruction(OpCodes.Ldloc_1);
+                    codes.Insert(i + 2, new CodeInstruction(OpCodes.Call, helper));
+                    patched = true;
+                    i++;
+                }
+            }
+
+            if (patched)
+                LogInfo("Patched minion gun cap to respect Minion Master.");
+            else
+                LogWarn("Could not patch minion gun cap; Minion Master may still be capped at 2.");
+
+            return codes;
+        }
+
+        private static bool IsCountGetter(CodeInstruction instruction)
+        {
+            return instruction != null &&
+                   instruction.opcode == OpCodes.Callvirt &&
+                   instruction.operand is MethodInfo method &&
+                   string.Equals(method.Name, "get_Count", StringComparison.Ordinal);
+        }
+
+        private static int GetMinionLimitForComparison(object player)
+        {
+            var directCount = ToInt(playerMinionCountField?.GetValue(player));
+            var talentProps = playerTalentSpecPropsField?.GetValue(player);
+            var talentCount = ToInt(specialPropertiesMinionCountProperty?.GetValue(talentProps, null));
+            return Math.Max(2, Math.Max(directCount, talentCount + 1));
+        }
+
+        private static void ApplyPostTalentFixups(object talent, object player)
+        {
+            try
+            {
+                var name = talentNameField?.GetValue(talent) as string;
+                if (!string.Equals(name, "Minion Master", StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                var desiredExtraMinions = Math.Max(0, ToInt(talentCurrentLevelField?.GetValue(talent)));
+                var desiredDirectCount = 1 + desiredExtraMinions;
+
+                var talentProps = playerTalentSpecPropsField?.GetValue(player);
+                if (talentProps != null && specialPropertiesMinionCountProperty != null)
+                {
+                    var currentTalentCount = ToInt(specialPropertiesMinionCountProperty.GetValue(talentProps, null));
+                    if (currentTalentCount < desiredExtraMinions)
+                        specialPropertiesMinionCountProperty.SetValue(talentProps, desiredExtraMinions, null);
+                }
+
+                var currentDirectCount = ToInt(playerMinionCountField?.GetValue(player));
+                if (currentDirectCount < desiredDirectCount)
+                    playerMinionCountField?.SetValue(player, desiredDirectCount);
+                playerFireUpdatePropertiesMethod?.Invoke(player, null);
+                LogInfo("Applied Minion Master runtime cap fix.");
+            }
+            catch (Exception ex)
+            {
+                LogWarn($"Minion Master fixup failed: {ex.Message}");
+            }
         }
 
         private static void XboxStoreDrawPostfix(object __instance, object __0)
