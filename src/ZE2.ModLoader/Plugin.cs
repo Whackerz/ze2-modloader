@@ -109,8 +109,81 @@ namespace ZE2.ModLoader
                 pendingSpriteBoundBulletNames);
             CharacterExpansionPatches.Install(harmony);
             ParityFeatures.Install(log);
+            InstallIntroPatches();
             InstallMultiplayerModSyncPatches();
             LoadDllMods();
+        }
+
+        private void InstallIntroPatches()
+        {
+            try
+            {
+                var logoMenu = AccessTools.TypeByName("ZombieEstate2.UI.Menus.LogoMenu");
+                if (logoMenu == null)
+                {
+                    log.LogWarning("Intro patch skipped: LogoMenu type was unavailable.");
+                    return;
+                }
+
+                var update = AccessTools.Method(logoMenu, "UpdateMenu");
+                var draw = AccessTools.Method(logoMenu, "DrawMenu");
+                if (update != null)
+                {
+                    harmony.Patch(
+                        update,
+                        prefix: new HarmonyMethod(typeof(Plugin).GetMethod(nameof(LogoMenuUpdatePrefix), BindingFlags.Static | BindingFlags.NonPublic)));
+                    log.LogInfo("Patched intro logo update for Escape skip.");
+                }
+
+                if (draw != null)
+                {
+                    harmony.Patch(
+                        draw,
+                        postfix: new HarmonyMethod(typeof(Plugin).GetMethod(nameof(LogoMenuDrawPostfix), BindingFlags.Static | BindingFlags.NonPublic)));
+                    log.LogInfo("Patched intro logo draw for modloader status text.");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.LogWarning("Intro patch install failed: " + ex.Message);
+            }
+        }
+
+        private static void LogoMenuUpdatePrefix(object __instance)
+        {
+            try
+            {
+                if (!Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+                    return;
+
+                var totalTime = AccessTools.Field(__instance.GetType(), "mTotalTime");
+                var total = AccessTools.Field(__instance.GetType(), "TOTAL_TIME");
+                if (totalTime == null || total == null)
+                    return;
+
+                totalTime.SetValue(__instance, (float)total.GetValue(null));
+            }
+            catch (Exception ex)
+            {
+                staticLog?.LogWarning("Intro Escape skip failed: " + ex.Message);
+            }
+        }
+
+        private static void LogoMenuDrawPostfix(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)
+        {
+            try
+            {
+                if (spriteBatch == null || ZombieEstate2.Global.StoreFontSmall == null)
+                    return;
+
+                var text = "ZE2 ModLoader active - press Esc to skip intro";
+                var pos = new Microsoft.Xna.Framework.Vector2(24f, Math.Max(24f, ZombieEstate2.Global.ScreenRect.Height - 44f));
+                ZombieEstate2.Shadow.DrawString(text, ZombieEstate2.Global.StoreFontSmall, pos, 1, Microsoft.Xna.Framework.Color.LightGreen, spriteBatch);
+            }
+            catch (Exception ex)
+            {
+                staticLog?.LogWarning("Intro modloader status draw failed: " + ex.Message);
+            }
         }
 
         private void InstallMultiplayerModSyncPatches()
